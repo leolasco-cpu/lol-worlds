@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>7a0 LoL — Monte o time dos sonhos</title>
+<style>
+:root{--bg:#f4f1ea;--card:#fff;--ink:#14202b;--mut:#5d6b78;--line:#d9d2c2;--gold:#a8791c;--acc:#0a7d8c;--ok:#1d8a4e;--bad:#c23b3b;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0a1219;--card:#13202b;--ink:#eee8d8;--mut:#8fa0ae;--line:#25384a;--gold:#c8aa6e;--acc:#0ac8b9;--ok:#3fcf8e;--bad:#ef6a6a}}
+:root[data-theme="dark"]{--bg:#0a1219;--card:#13202b;--ink:#eee8d8;--mut:#8fa0ae;--line:#25384a;--gold:#c8aa6e;--acc:#0ac8b9;--ok:#3fcf8e;--bad:#ef6a6a}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.4}
+main{max-width:760px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:2.4rem;margin:.2em 0;letter-spacing:-.02em}
+h1 b{color:var(--gold)}
+.sub{color:var(--mut);margin:0 0 20px}
+.btn{background:var(--gold);color:#fff;border:0;border-radius:10px;padding:12px 20px;font-size:1rem;font-weight:700;cursor:pointer}
+:root:not([data-theme="light"]) .btn{color:#0a1219}
+.btn.sec{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.lineup{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:16px 0}
+.slot{background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px 6px;text-align:center;min-height:84px}
+.slot.f{border-style:solid;border-color:var(--gold)}
+.slot .r{font-size:.7rem;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+.slot .n{font-weight:700;margin-top:4px;word-break:break-word}
+.slot .t{font-size:.68rem;color:var(--mut)}
+.slot .v{color:var(--gold);font-weight:800}
+.roll{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin-top:8px}
+.roll h2{margin:0;font-size:1.3rem}
+.roll .y{color:var(--mut);margin:0 0 12px}
+.pl{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}
+.pl button{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;color:var(--ink);cursor:pointer;text-align:left;font:inherit}
+.pl button:hover:not(:disabled){border-color:var(--acc)}
+.pl button:disabled{opacity:.35;cursor:not-allowed}
+.pl .r{font-size:.7rem;color:var(--mut);text-transform:uppercase}
+.pl .n{font-weight:700}
+.pl .v{color:var(--gold);font-weight:800;float:right}
+.res{display:grid;gap:8px;margin:16px 0}
+.m{display:flex;justify-content:space-between;gap:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:10px 14px}
+.m.w{border-left-color:var(--ok)}.m.l{border-left-color:var(--bad)}
+.m small{color:var(--mut);display:block}
+.sc{font-weight:800;font-size:1.2rem;white-space:nowrap}
+.big{font-size:3.2rem;font-weight:900;color:var(--gold);margin:8px 0}
+.stat{color:var(--mut);font-size:.9rem}
+.hide{display:none}
+@media(max-width:520px){.lineup{grid-template-columns:repeat(2,1fr)}h1{font-size:1.9rem}}
+</style>
+</head>
+<body>
+<main>
+<div id="app"></div>
+</main>
+<script>
+const ROLES=['Top','Jungle','Mid','ADC','Suporte'];
+const RAW=`SKT T1|2013|Impact:86,Bengi:90,Faker:92,Piglet:88,PoohManDu:82
+Samsung White|2014|Looper:88,DanDy:84,PawN:88,imp:86,Mata:90
+SKT T1|2015|MaRin:92,Bengi:92,Faker:96,Bang:90,Wolf:90
+SKT T1|2016|Duke:90,Bengi:90,Faker:96,Bang:94,Wolf:92
+SKT T1|2017|Huni:89,Peanut:93,Faker:95,Bang:93,Wolf:90
+Samsung Galaxy|2017|CuVee:93,Ambition:92,Crown:92,Ruler:92,CoreJJ:90
+Invictus Gaming|2018|TheShy:97,Ning:90,Rookie:93,JackeyLove:90,Baolan:84
+Royal Never Give Up|2018|Letme:88,Mlxg:88,Xiaohu:90,Uzi:96,Ming:88
+FunPlus Phoenix|2019|GimGoon:86,Tian:92,Doinb:94,Lwx:90,Crisp:92
+G2 Esports|2019|Wunder:90,Jankos:92,Caps:94,Perkz:92,Mikyx:88
+Fnatic|2015|Huni:88,Reignover:88,Febiven:86,Rekkles:86,YellOwStaR:88
+Fnatic|2018|Bwipo:88,Broxah:86,Caps:92,Rekkles:92,Hylissang:86
+DAMWON Gaming|2020|Nuguri:92,Canyon:96,ShowMaker:94,Ghost:90,BeryL:94
+EDward Gaming|2021|Flandre:88,Jiejie:90,Scout:92,Viper:94,Meiko:90
+DRX|2022|Kingen:88,Pyosik:90,Zeka:92,Deft:94,BeryL:92
+LOUD|2022|Robo:80,Croc:82,tinowns:84,Brance:84,RedBert:80
+JD Gaming|2023|369:92,Kanavi:94,Knight:95,Ruler:94,Missing:88
+Gen.G|2023|Doran:86,Peanut:92,Chovy:96,Peyz:92,Delight:88
+Gen.G|2024|Kiin:92,Canyon:95,Chovy:97,Peyz:93,Lehends:92
+T1|2024|Zeus:94,Oner:95,Faker:96,Gumayusi:95,Keria:98
+Bilibili Gaming|2024|Bin:95,Xun:90,Knight:94,Elk:92,ON:88
+Hanwha Life Esports|2024|Zeus:93,Peanut:92,Zeka:92,Viper:95,Delight:90`;
+const TEAMS=RAW.split('\n').map(l=>{const[a,y,p]=l.split('|');return{name:a,year:y,pl:p.split(',').map((x,i)=>{const[n,v]=x.split(':');return{n,v:+v,role:i,team:a+' '+y}})}});
+const ROUNDS=[['Fase Suíça · R1',3],['Fase Suíça · R2',3],['Fase Suíça · R3',3],['Quartas de final',5],['Semifinal',5],['Final',5],['Grande final',5]];
+const avgOf=t=>t.pl.reduce((a,p)=>a+p.v,0)/5;
+function opponents(){const mine=S.lineup.map(p=>p.team);const pool=TEAMS.filter(t=>!t.pl.some(p=>mine.includes(p.team))||false).filter(t=>!mine.includes(t.name+' '+t.year)).sort((a,b)=>avgOf(a)-avgOf(b));const n=pool.length;return ROUNDS.map((r,k)=>pool[Math.round(k*(n-1)/6)])}
+const $=s=>document.querySelector(s),app=$('#app');
+let S;
+function fresh(){S={lineup:[null,null,null,null,null],used:[],cur:null,rr:2,phase:'intro'}}
+function best(){try{return localStorage.getItem('lol7a0best')||'0'}catch(e){return '0'}}
+function saveBest(w){try{if(w>+best())localStorage.setItem('lol7a0best',w)}catch(e){}}
+function roll(){const av=TEAMS.map((t,i)=>i).filter(i=>!S.used.includes(i));const i=av[Math.floor(Math.random()*av.length)];S.used.push(i);S.cur=TEAMS[i]}
+function start(){fresh();S.phase='draft';roll();draw()}
+function pick(i){const p=S.cur.pl[i];if(S.lineup[p.role])return;S.lineup[p.role]=p;if(S.lineup.every(Boolean)){S.phase='ready';S.cur=null}else roll();draw()}
+function reroll(){if(S.rr<1)return;S.rr--;roll();draw()}
+function strength(){const L=S.lineup,avg=L.reduce((a,p)=>a+p.v,0)/5;const c={};L.forEach(p=>c[p.team]=(c[p.team]||0)+1);let syn=0;for(const k in c)syn+=(c[k]-1)*1.2;return{avg,syn,tot:avg+syn}}
+function lineupHTML(){return '<div class="lineup">'+ROLES.map((r,i)=>{const p=S.lineup[i];return p?`<div class="slot f"><div class="r">${r}</div><div class="n">${p.n}</div><div class="t">${p.team}</div><div class="v">${p.v}</div></div>`:`<div class="slot"><div class="r">${r}</div><div class="n" style="color:var(--mut)">—</div></div>`}).join('')+'</div>'}
+function draw(){
+ if(S.phase==='intro'){app.innerHTML=`<h1>7<b>a</b>0 <span style="font-weight:400">LoL</span></h1><p class="sub">Role os dados, receba um time e uma temporada do cenário competitivo, escolha um jogador que realmente esteve lá e monte seu line-up dos sonhos. Depois enfrente 7 séries: vença todas e você alcança o 7–0.</p><div class="row"><button class="btn" id="go">Jogar →</button></div><p class="stat">Melhor campanha: ${best()} vitórias seguidas · ${TEAMS.length} elencos · ${TEAMS.length*5} jogadores</p><p class="stat">Dica: jogadores do mesmo elenco ganham bônus de entrosamento.</p>`;$('#go').onclick=start;return}
+ if(S.phase==='draft'){const n=S.lineup.filter(Boolean).length;app.innerHTML=`<h1>Escolha ${n+1}/5</h1>${lineupHTML()}<div class="roll"><h2>${S.cur.name}</h2><p class="y">Temporada ${S.cur.year} · escolha uma lane ainda vaga</p><div class="pl">${S.cur.pl.map((p,i)=>`<button data-i="${i}" ${S.lineup[p.role]?'disabled':''}><span class="v">${p.v}</span><div class="r">${ROLES[p.role]}</div><div class="n">${p.n}</div></button>`).join('')}</div></div><div class="row" style="margin-top:12px"><button class="btn sec" id="rr" ${S.rr<1?'disabled':''}>Rolar de novo (${S.rr})</button></div>`;
+  app.querySelectorAll('.pl button').forEach(b=>b.onclick=()=>pick(+b.dataset.i));$('#rr').onclick=reroll;return}
+ if(S.phase==='ready'){const s=strength();app.innerHTML=`<h1>Seu time está pronto</h1>${lineupHTML()}<p class="stat">Média ${s.avg.toFixed(1)} + entrosamento ${s.syn.toFixed(1)} = força <b>${s.tot.toFixed(1)}</b></p><div class="row"><button class="btn" id="sim">Simular campanha</button><button class="btn sec" id="re">Recomeçar</button></div>`;$('#sim').onclick=sim;$('#re').onclick=start;return}
+}
+function series(me,opp,bo){const p=1/(1+Math.pow(10,(opp-me)/10)),need=(bo+1)/2;let a=0,b=0;while(a<need&&b<need){Math.random()<p?a++:b++}return[a,b]}
+function sim(){
+ const s=strength();let wins=0,over=false;const out=[];const opp=opponents();
+ for(let k=0;k<ROUNDS.length;k++){if(over)break;const[r,bo]=ROUNDS[k],o=opp[k],[a,b]=series(s.tot,avgOf(o),bo);const w=a>b;out.push({r,o,a,b,w});if(w)wins++;else over=true}
+ saveBest(wins);
+ const desc=o=>`${o.name} ${o.year}<small>${o.pl.map(p=>p.n).join(' · ')} · força ${avgOf(o).toFixed(1)}</small>`;
+ app.innerHTML=`<h1>Campanha</h1>${lineupHTML()}<p class="stat">Seus adversários, em ordem de dificuldade:</p><div class="res" id="res">${opp.map((o,k)=>`<div class="m" id="m${k}"><div><small style="display:inline">${ROUNDS[k][0]} (MD${ROUNDS[k][1]})</small><br><b>vs ${desc(o)}</b></div><div class="sc" id="s${k}">vs</div></div>`).join('')}</div><div id="end" class="hide"></div>`;
+ let i=0;
+ const t=setInterval(()=>{if(i>=out.length){clearInterval(t);final(wins,out.length);return}
+  const m=out[i],el=$('#m'+i);el.classList.add(m.w?'w':'l');$('#s'+i).textContent=m.a+'–'+m.b;i++},900)
+}
+function final(w,played){
+ const perfect=w===7,e=$('#end');e.classList.remove('hide');
+ const txt=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
+ const lost=played-w;
+ e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button><button class="btn sec" id="cp">Copiar resultado</button></div>`;
+ $('#again').onclick=start;
+ $('#cp').onclick=()=>{const m=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} · ${w}–${lost}${perfect?' 🏆':''}`;try{navigator.clipboard.writeText(m);$('#cp').textContent='Copiado!'}catch(x){$('#cp').textContent=m}}
+}
+fresh();draw();
+</script>
+</body>
+</html>
