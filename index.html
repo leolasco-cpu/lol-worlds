@@ -62,6 +62,19 @@ h1 span{font-weight:500}
 .lg{font-size:.82rem;color:#c9c2b0;margin-top:6px;padding-left:9px;border-left:2px solid var(--line);line-height:1.4}
 .lg.w{border-left-color:var(--ok)}.lg.l{border-left-color:var(--bad)}
 .lg b{color:var(--ink)}.lg .gn{font-family:var(--head);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-right:4px}
+#tro{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 45%,rgba(10,50,60,.92),rgba(1,10,19,.97));overflow:hidden;animation:fin .6s ease both;padding:20px;text-align:center}
+#tro .rays{position:absolute;width:160vmax;height:160vmax;left:50%;top:45%;margin:-80vmax 0 0 -80vmax;background:repeating-conic-gradient(from 0deg,rgba(200,170,110,.20) 0 6deg,transparent 6deg 18deg);-webkit-mask-image:radial-gradient(circle,#000 0,transparent 55%);mask-image:radial-gradient(circle,#000 0,transparent 55%);animation:spin 40s linear infinite}
+#tro svg{position:relative;width:min(52vw,230px);height:auto;filter:drop-shadow(0 0 24px rgba(200,170,110,.7));animation:rise 1.8s cubic-bezier(.2,.9,.25,1) both,flt 3s ease-in-out 1.8s infinite}
+#tro h2{position:relative;font-family:var(--head);font-size:clamp(1.6rem,6vw,2.6rem);margin:18px 0 4px;color:#dcc07a;text-shadow:0 0 20px rgba(200,170,110,.5);animation:fin 1s ease 1.2s both}
+#tro p{position:relative;margin:0 0 6px;color:#e3dac5;animation:fin 1s ease 1.6s both}
+#tro .btn{position:relative;margin-top:18px;animation:fin 1s ease 2s both}
+.cf{position:absolute;top:-20px;width:8px;height:14px;opacity:.9;animation:fall linear forwards}
+@keyframes fin{from{opacity:0}to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes rise{from{transform:translateY(160px) scale(.3);opacity:0}to{transform:none;opacity:1}}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+@media (prefers-reduced-motion:reduce){#tro .rays,#tro svg,.cf{animation:none}}
 .hide{display:none}
 @media(max-width:520px){.lineup{grid-template-columns:repeat(2,1fr)}h1{font-size:1.8rem}}
 </style>
@@ -175,12 +188,21 @@ async function sim(){
  $('#skip').classList.add('hide');$('#nx').classList.add('hide');
  final(wins,out.length);
 }
+function trophy(){
+ if($('#tro'))return;
+ const d=document.createElement('div');d.id='tro';
+ const cols=['#c8aa6e','#f0e6d2','#0ac8b9','#dcc07a'];
+ let cf='';for(let i=0;i<46;i++)cf+=`<i class="cf" style="left:${Math.random()*100}%;background:${cols[i%4]};animation-duration:${3+Math.random()*3}s;animation-delay:${Math.random()*3}s"></i>`;
+ d.innerHTML=`<div class="rays"></div>${cf}<svg viewBox="0 0 200 300" aria-hidden="true"><defs><linearGradient id="sv" x1="0" x2="1"><stop offset="0" stop-color="#8d98a0"/><stop offset=".35" stop-color="#fafafa"/><stop offset=".7" stop-color="#b3bcc3"/><stop offset="1" stop-color="#7d8890"/></linearGradient><linearGradient id="gd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6e3a1"/><stop offset=".5" stop-color="#c8aa6e"/><stop offset="1" stop-color="#785a28"/></linearGradient><radialGradient id="gm"><stop offset="0" stop-color="#e8fffd"/><stop offset=".5" stop-color="#0ac8b9"/><stop offset="1" stop-color="#0a6e7c"/></radialGradient></defs><path d="M46 70C8 70 8 128 62 138" fill="none" stroke="url(#sv)" stroke-width="7" stroke-linecap="round"/><path d="M154 70C192 70 192 128 138 138" fill="none" stroke="url(#sv)" stroke-width="7" stroke-linecap="round"/><path d="M45 55Q45 150 100 180Q155 150 155 55Z" fill="url(#sv)"/><ellipse cx="100" cy="55" rx="55" ry="11" fill="url(#gd)"/><ellipse cx="100" cy="55" rx="46" ry="7" fill="#3a4650"/><path d="M52 88Q100 122 148 88" fill="none" stroke="url(#gd)" stroke-width="4"/><path d="M62 122Q100 152 138 122" fill="none" stroke="url(#gd)" stroke-width="4"/><circle cx="100" cy="108" r="11" fill="url(#gm)" stroke="url(#gd)" stroke-width="3"/><path d="M88 178H112L108 238H92Z" fill="url(#sv)"/><ellipse cx="100" cy="208" rx="17" ry="8" fill="url(#gd)"/><path d="M72 240H128L146 284H54Z" fill="url(#sv)"/><rect x="50" y="282" width="100" height="12" rx="4" fill="url(#gd)"/></svg><h2>Campeão mundial!</h2><p>Campanha perfeita: <b>7–0</b></p><p style="font-size:.9rem">${S.lineup.map(p=>p.n).join(' · ')}</p><button class="btn" id="trx">Continuar</button>`;
+ document.body.appendChild(d);
+ $('#trx').onclick=()=>d.remove();
+}
 function final(w,played){
  const perfect=w===7,e=$('#end');e.classList.remove('hide');
  const txt=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
  const lost=played-w;
  e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button><button class="btn sec" id="cp">Copiar resultado</button></div>`;
- $('#again').onclick=start;
+ $('#again').onclick=start;if(perfect)setTimeout(trophy,500);
  $('#cp').onclick=()=>{const m=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} · ${w}–${lost}${perfect?' 🏆':''}`;try{navigator.clipboard.writeText(m);$('#cp').textContent='Copiado!'}catch(x){$('#cp').textContent=m}}
 }
 fresh();draw();
