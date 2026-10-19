@@ -50,6 +50,14 @@ h1 span{font-weight:500}
 .big{font-family:var(--head);font-size:3.4rem;font-weight:900;margin:8px 0;color:#dcc07a;text-shadow:0 0 18px rgba(200,170,110,.25)}
 .stat{color:#c9c2b0;font-size:.92rem}
 .stat b{color:var(--gold)}
+.dots{display:flex;gap:5px;margin-top:6px;min-height:10px}
+.d{width:10px;height:10px;border-radius:50%;display:inline-block}
+.d.w{background:var(--ok)}.d.l{background:var(--bad)}
+.m.live{border-left-color:var(--gold);box-shadow:0 0 14px rgba(200,170,110,.25)}
+.pend{color:var(--gold);font-size:.85rem;animation:bl 1s infinite alternate}
+@keyframes bl{from{opacity:.4}to{opacity:1}}
+.chip{padding:9px 14px;font-size:.78rem}
+.chip.on{border-color:var(--gold);background:rgba(200,170,110,.18);color:#f0e6d2}
 .hide{display:none}
 @media(max-width:520px){.lineup{grid-template-columns:repeat(2,1fr)}h1{font-size:1.8rem}}
 </style>
@@ -81,11 +89,23 @@ Gen.G|2023|Doran:86,Peanut:92,Chovy:96,Peyz:92,Delight:88
 Gen.G|2024|Kiin:92,Canyon:95,Chovy:97,Peyz:93,Lehends:92
 T1|2024|Zeus:94,Oner:95,Faker:96,Gumayusi:95,Keria:98
 Bilibili Gaming|2024|Bin:95,Xun:90,Knight:94,Elk:92,ON:88
-Hanwha Life Esports|2024|Zeus:93,Peanut:92,Zeka:92,Viper:95,Delight:90`;
-const TEAMS=RAW.split('\n').map(l=>{const[a,y,p]=l.split('|');return{name:a,year:y,pl:p.split(',').map((x,i)=>{const[n,v]=x.split(':');return{n,v:+v,role:i,team:a+' '+y}})}});
+Hanwha Life Esports|2024|Zeus:93,Peanut:92,Zeka:92,Viper:95,Delight:90
+Cloud9|2018|Licorice:84,Blaber:86,Jensen:88,Sneaky:86,Zeyzal:82
+Team Liquid|2019|Impact:86,Xmithie:84,Jensen:88,Doublelift:90,CoreJJ:88
+TSM|2018|Hauntzer:82,Svenskeren:82,Bjergsen:88,Zven:84,Mithy:80
+100 Thieves|2021|Ssumday:84,Closer:84,Abbedagge:80,FBI:82,Huhi:78
+MAD Lions|2021|Armut:84,Elyoya:86,Humanoid:86,Carzzy:84,Kaiser:84
+G2 Esports|2021|BrokenBlade:86,Jankos:86,Caps:90,Rekkles:86,Mikyx:84
+G2 Esports|2023|BrokenBlade:88,Yike:84,Caps:90,Hans sama:88,Mikyx:86
+PSG Talon|2021|Hanabi:82,River:80,Maple:84,Unified:80,Kaiwing:82
+paiN Gaming|2021|Robo:78,Cariok:78,Tinowns:80,brTT:80,Luci:76
+LØS|2026|Zest:80,Curse:78,Feisty:80,Duduhh:78,Ackerman:76`;
+const ORG={'SKT T1':'T1','Samsung Galaxy':'Gen.G','Samsung White':'Gen.G'};
+const REG={'SKT T1':'LCK','Samsung White':'LCK','Samsung Galaxy':'LCK','DAMWON Gaming':'LCK','DRX':'LCK','Gen.G':'LCK','T1':'LCK','Hanwha Life Esports':'LCK','Invictus Gaming':'LPL','Royal Never Give Up':'LPL','FunPlus Phoenix':'LPL','EDward Gaming':'LPL','JD Gaming':'LPL','Bilibili Gaming':'LPL','G2 Esports':'LEC','Fnatic':'LEC','MAD Lions':'LEC','Cloud9':'LCS','Team Liquid':'LCS','TSM':'LCS','100 Thieves':'LCS','PSG Talon':'PCS','LOUD':'CBLOL','paiN Gaming':'CBLOL','LØS':'CBLOL'};
+const TEAMS=RAW.split('\n').map(l=>{const[a,y,p]=l.split('|');return{name:a,year:y,pl:p.split(',').map((x,i)=>{const[n,v]=x.split(':');return{n,v:+v,role:i,team:a+' '+y,org:ORG[a]||a}})}});
 const ROUNDS=[['Fase Suíça · R1',3],['Fase Suíça · R2',3],['Fase Suíça · R3',3],['Quartas de final',5],['Semifinal',5],['Final',5],['Grande final',5]];
 const avgOf=t=>t.pl.reduce((a,p)=>a+p.v,0)/5;
-function opponents(){const mine=S.lineup.map(p=>p.team);const pool=TEAMS.filter(t=>!t.pl.some(p=>mine.includes(p.team))||false).filter(t=>!mine.includes(t.name+' '+t.year)).sort((a,b)=>avgOf(a)-avgOf(b));const n=pool.length;return ROUNDS.map((r,k)=>pool[Math.round(k*(n-1)/6)])}
+function opponents(){const mine=S.lineup.map(p=>p.team);const pool=TEAMS.filter(t=>!mine.includes(t.name+' '+t.year)).sort((a,b)=>avgOf(a)-avgOf(b));const n=pool.length,w=Math.max(1,Math.round(n/10)),used=new Set(),res=[];for(let k=0;k<ROUNDS.length;k++){const c=Math.round(k*(n-1)/6);let lo=Math.max(0,c-w),hi=Math.min(n-1,c+w);if(k===ROUNDS.length-1){hi=n-1;lo=Math.max(0,n-1-2*w)}let cand=[];for(let i=lo;i<=hi;i++)if(!used.has(i))cand.push(i);if(!cand.length)for(let i=0;i<n;i++)if(!used.has(i))cand.push(i);const i=cand[Math.floor(Math.random()*cand.length)];used.add(i);res.push(pool[i])}return res.sort((a,b)=>avgOf(a)-avgOf(b))}
 const $=s=>document.querySelector(s),app=$('#app');
 let S;
 function fresh(){S={lineup:[null,null,null,null,null],used:[],cur:null,rr:2,phase:'intro'}}
@@ -95,24 +115,50 @@ function roll(){const av=TEAMS.map((t,i)=>i).filter(i=>!S.used.includes(i));cons
 function start(){fresh();S.phase='draft';roll();draw()}
 function pick(i){const p=S.cur.pl[i];if(S.lineup[p.role])return;S.lineup[p.role]=p;if(S.lineup.every(Boolean)){S.phase='ready';S.cur=null}else roll();draw()}
 function reroll(){if(S.rr<1)return;S.rr--;roll();draw()}
-function strength(){const L=S.lineup,avg=L.reduce((a,p)=>a+p.v,0)/5;const c={};L.forEach(p=>c[p.team]=(c[p.team]||0)+1);let syn=0;for(const k in c)syn+=(c[k]-1)*1.2;return{avg,syn,tot:avg+syn}}
+function strength(){const L=S.lineup,avg=L.reduce((a,p)=>a+p.v,0)/5;const c={};L.forEach(p=>c[p.org]=(c[p.org]||0)+1);let syn=0;const grp=[];for(const k in c)if(c[k]>1){syn+=(c[k]-1)*1.2;grp.push(k+' ('+c[k]+')')}return{avg,syn,grp,tot:avg+syn}}
 function lineupHTML(){return '<div class="lineup">'+ROLES.map((r,i)=>{const p=S.lineup[i];return p?`<div class="slot f"><div class="r">${r}</div><div class="n">${p.n}</div><div class="t">${p.team}</div><div class="v">${p.v}</div></div>`:`<div class="slot"><div class="r">${r}</div><div class="n" style="color:var(--mut)">—</div></div>`}).join('')+'</div>'}
 function draw(){
- if(S.phase==='intro'){app.innerHTML=`<h1>7<b>a</b>0 <span style="font-weight:400">LoL</span></h1><p class="sub">Role os dados, receba um time e uma temporada do cenário competitivo, escolha um jogador que realmente esteve lá e monte seu line-up dos sonhos. Depois enfrente 7 séries: vença todas e você alcança o 7–0.</p><div class="row"><button class="btn" id="go">Jogar →</button></div><p class="stat">Melhor campanha: ${best()} vitórias seguidas · ${TEAMS.length} elencos · ${TEAMS.length*5} jogadores</p><p class="stat">Dica: jogadores do mesmo elenco ganham bônus de entrosamento.</p>`;$('#go').onclick=start;return}
- if(S.phase==='draft'){const n=S.lineup.filter(Boolean).length;app.innerHTML=`<h1>Escolha ${n+1}/5</h1>${lineupHTML()}<div class="roll"><h2>${S.cur.name}</h2><p class="y">Temporada ${S.cur.year} · escolha uma lane ainda vaga</p><div class="pl">${S.cur.pl.map((p,i)=>`<button data-i="${i}" ${S.lineup[p.role]?'disabled':''}><span class="v">${p.v}</span><div class="r">${ROLES[p.role]}</div><div class="n">${p.n}</div></button>`).join('')}</div></div><div class="row" style="margin-top:12px"><button class="btn sec" id="rr" ${S.rr<1?'disabled':''}>Rolar de novo (${S.rr})</button></div>`;
+ if(S.phase==='intro'){app.innerHTML=`<h1>7<b>a</b>0 <span style="font-weight:400">LoL</span></h1><p class="sub">Role os dados, receba um time e uma temporada do cenário competitivo, escolha um jogador que realmente esteve lá e monte seu line-up dos sonhos. Depois enfrente 7 séries: vença todas e você alcança o 7–0.</p><div class="row"><button class="btn" id="go">Jogar →</button></div><p class="stat">Melhor campanha: ${best()} vitórias seguidas · ${TEAMS.length} elencos · ${TEAMS.length*5} jogadores</p><p class="stat">Dica: jogadores da mesma organização ganham bônus de entrosamento, mesmo que de anos diferentes (ex.: Faker em 2013 e Keria em 2024, ambos T1).</p>`;$('#go').onclick=start;return}
+ if(S.phase==='draft'){const n=S.lineup.filter(Boolean).length;app.innerHTML=`<h1>Escolha ${n+1}/5</h1>${lineupHTML()}<div class="roll"><h2>${S.cur.name}</h2><p class="y">Temporada ${S.cur.year} · ${REG[S.cur.name]||''} · escolha uma lane ainda vaga</p><div class="pl">${S.cur.pl.map((p,i)=>`<button data-i="${i}" ${S.lineup[p.role]?'disabled':''}><span class="v">${p.v}</span><div class="r">${ROLES[p.role]}</div><div class="n">${p.n}</div></button>`).join('')}</div></div><div class="row" style="margin-top:12px"><button class="btn sec" id="rr" ${S.rr<1?'disabled':''}>Rolar de novo (${S.rr})</button></div>`;
   app.querySelectorAll('.pl button').forEach(b=>b.onclick=()=>pick(+b.dataset.i));$('#rr').onclick=reroll;return}
- if(S.phase==='ready'){const s=strength();app.innerHTML=`<h1>Seu time está pronto</h1>${lineupHTML()}<p class="stat">Média ${s.avg.toFixed(1)} + entrosamento ${s.syn.toFixed(1)} = força <b>${s.tot.toFixed(1)}</b></p><div class="row"><button class="btn" id="sim">Simular campanha</button><button class="btn sec" id="re">Recomeçar</button></div>`;$('#sim').onclick=sim;$('#re').onclick=start;return}
+ if(S.phase==='ready'){const s=strength();app.innerHTML=`<h1>Seu time está pronto</h1>${lineupHTML()}<p class="stat">Média ${s.avg.toFixed(1)} + entrosamento ${s.syn.toFixed(1)} = força <b>${s.tot.toFixed(1)}</b></p><p class="stat">${s.grp.length?'Entrosamento: '+s.grp.join(', '):'Sem entrosamento: nenhum jogador da mesma organização.'}</p><p class="stat" style="margin-top:18px">Modo:</p><div class="row">${chips('mode',MODES)}</div><p class="stat" id="mdesc">${MDESC[CFG.mode]}</p><p class="stat" style="margin-top:12px">Velocidade:</p><div class="row">${chips('speed',SPEEDS)}</div><p class="stat" id="sdesc">${SDESC[CFG.speed]}</p><div class="row" style="margin-top:14px"><button class="btn" id="sim">Simular campanha</button><button class="btn sec" id="re">Recomeçar</button></div>`;app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const g=b.dataset.g;CFG[g]=b.dataset.k;app.querySelectorAll('.chip[data-g="'+g+'"]').forEach(c=>c.classList.toggle('on',c===b));$('#mdesc').textContent=MDESC[CFG.mode];$('#sdesc').textContent=SDESC[CFG.speed]});$('#sim').onclick=sim;$('#re').onclick=start;return}
 }
-function series(me,opp,bo){const p=1/(1+Math.pow(10,(opp-me)/10)),need=(bo+1)/2;let a=0,b=0;while(a<need&&b<need){Math.random()<p?a++:b++}return[a,b]}
-function sim(){
- const s=strength();let wins=0,over=false;const out=[];const opp=opponents();
- for(let k=0;k<ROUNDS.length;k++){if(over)break;const[r,bo]=ROUNDS[k],o=opp[k],[a,b]=series(s.tot,avgOf(o),bo);const w=a>b;out.push({r,o,a,b,w});if(w)wins++;else over=true}
+let SKIP=false;
+const CFG={mode:'auto',speed:'normal'};
+const MODES={auto:'Automático',manual:'Manual'};
+const SPEEDS={slow:'Devagar',normal:'Normal',fast:'Rápido'};
+const MDESC={auto:'As partidas acontecem sozinhas, uma após a outra, até a campanha terminar ou você ser eliminado.',manual:'Você clica para iniciar cada série; os jogos de cada série acontecem sozinhos. A campanha termina quando acabar ou você for eliminado.'};
+const SDESC={slow:'Devagar: cada jogo leva até 4 segundos, com mais suspense nos jogos de match point e decisivos.',normal:'Normal: cada partida leva cerca de 2 segundos.',fast:'Rápido: cada partida leva menos de 1 segundo.'};
+const T={slow:{g:3000,p:3500,d:4000,gap:800,end:1000},normal:{g:1800,p:2100,d:2500,gap:500,end:700},fast:{g:600,p:800,d:1000,gap:200,end:300}};
+const chips=(g,o)=>Object.keys(o).map(k=>`<button class="btn sec chip${k===CFG[g]?' on':''}" data-g="${g}" data-k="${k}">${o[k]}</button>`).join('');
+const sleep=ms=>SKIP?Promise.resolve():new Promise(r=>setTimeout(r,ms));
+function series(me,opp,bo){const p=1/(1+Math.pow(10,(opp-me)/10)),need=(bo+1)/2;let a=0,b=0;const g=[];while(a<need&&b<need){const w=Math.random()<p;w?a++:b++;g.push(w)}return{a,b,g,w:a>b}}
+async function sim(){
+ const s=strength(),opp=opponents(),t=T[CFG.speed],manual=CFG.mode==='manual';let wins=0,over=false;const out=[];SKIP=false;
+ for(let k=0;k<ROUNDS.length;k++){if(over)break;const[r,bo]=ROUNDS[k],o=opp[k],x=series(s.tot,avgOf(o),bo);out.push({r,o,bo,...x});if(x.w)wins++;else over=true}
  saveBest(wins);
  const desc=o=>`${o.name} ${o.year}<small>${o.pl.map(p=>p.n).join(' · ')} · força ${avgOf(o).toFixed(1)}</small>`;
- app.innerHTML=`<h1>Campanha</h1>${lineupHTML()}<p class="stat">Seus adversários, em ordem de dificuldade:</p><div class="res" id="res">${opp.map((o,k)=>`<div class="m" id="m${k}"><div><small style="display:inline">${ROUNDS[k][0]} (MD${ROUNDS[k][1]})</small><br><b>vs ${desc(o)}</b></div><div class="sc" id="s${k}">vs</div></div>`).join('')}</div><div id="end" class="hide"></div>`;
- let i=0;
- const t=setInterval(()=>{if(i>=out.length){clearInterval(t);final(wins,out.length);return}
-  const m=out[i],el=$('#m'+i);el.classList.add(m.w?'w':'l');$('#s'+i).textContent=m.a+'–'+m.b;i++},900)
+ app.innerHTML=`<h1>Campanha</h1>${lineupHTML()}<p class="stat">Seus adversários, em ordem de dificuldade:</p><div class="res" id="res">${opp.map((o,k)=>`<div class="m" id="m${k}"><div><small style="display:inline">${ROUNDS[k][0]} (MD${ROUNDS[k][1]})</small><br><b>vs ${desc(o)}</b><div class="dots" id="d${k}"></div></div><div class="sc" id="s${k}">vs</div></div>`).join('')}</div><div class="row"><button class="btn hide" id="nx">Jogar →</button><button class="btn sec" id="skip">Pular animação</button></div><div id="end" class="hide"></div>`;
+ $('#skip').onclick=()=>{SKIP=true;const n=$('#nx');if(!n.classList.contains('hide'))n.click()};
+ const next=lbl=>new Promise(res=>{if(SKIP)return res();const b=$('#nx');b.textContent=lbl;b.classList.remove('hide');b.onclick=()=>{b.classList.add('hide');res()}});
+ for(let i=0;i<out.length;i++){
+  const m=out[i],el=$('#m'+i),sc=$('#s'+i),dots=$('#d'+i),need=(m.bo+1)/2;
+  el.classList.add('live');if(!SKIP)el.scrollIntoView({block:'center',behavior:'smooth'});
+  let a=0,b=0;
+  if(manual)await next(`Iniciar série: ${m.r} →`);
+  for(let j=0;j<m.g.length;j++){
+   const decisive=a===need-1&&b===need-1,point=a===need-1||b===need-1;
+   const lbl=decisive?'Jogo decisivo':'Jogo '+(j+1);
+   sc.innerHTML=`<span class="pend">${lbl}…</span>`;
+   await sleep(decisive?t.d:point?t.p:t.g);
+   m.g[j]?a++:b++;sc.textContent=a+'–'+b;dots.insertAdjacentHTML('beforeend',`<i class="d ${m.g[j]?'w':'l'}"></i>`);
+   if(j<m.g.length-1)await sleep(t.gap);
+  }
+  el.classList.remove('live');el.classList.add(m.w?'w':'l');sc.textContent=a+'–'+b;
+  await sleep(t.end);
+ }
+ $('#skip').classList.add('hide');$('#nx').classList.add('hide');
+ final(wins,out.length);
 }
 function final(w,played){
  const perfect=w===7,e=$('#end');e.classList.remove('hide');
