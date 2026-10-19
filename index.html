@@ -58,6 +58,10 @@ h1 span{font-weight:500}
 @keyframes bl{from{opacity:.4}to{opacity:1}}
 .chip{padding:9px 14px;font-size:.78rem}
 .chip.on{border-color:var(--gold);background:rgba(200,170,110,.18);color:#f0e6d2}
+.m>div:first-child{flex:1;min-width:0}
+.lg{font-size:.82rem;color:#c9c2b0;margin-top:6px;padding-left:9px;border-left:2px solid var(--line);line-height:1.4}
+.lg.w{border-left-color:var(--ok)}.lg.l{border-left-color:var(--bad)}
+.lg b{color:var(--ink)}.lg .gn{font-family:var(--head);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-right:4px}
 .hide{display:none}
 @media(max-width:520px){.lineup{grid-template-columns:repeat(2,1fr)}h1{font-size:1.8rem}}
 </style>
@@ -133,25 +137,36 @@ const T={slow:{g:3000,p:3500,d:4000,gap:800,end:1000},normal:{g:1800,p:2100,d:25
 const chips=(g,o)=>Object.keys(o).map(k=>`<button class="btn sec chip${k===CFG[g]?' on':''}" data-g="${g}" data-k="${k}">${o[k]}</button>`).join('');
 const sleep=ms=>SKIP?Promise.resolve():new Promise(r=>setTimeout(r,ms));
 function series(me,opp,bo){const p=1/(1+Math.pow(10,(opp-me)/10)),need=(bo+1)/2;let a=0,b=0;const g=[];while(a<need&&b<need){const w=Math.random()<p;w?a++:b++;g.push(w)}return{a,b,g,w:a>b}}
+const STORY=[
+['{p} venceu o duelo na rota de cima, derrubou a primeira torre e abriu vantagem para o time','{p} acertou o teleporte no momento certo e virou a luta pelo Barão','{p} aguentou sozinho a pressão de dois jogadores no top e segurou a torre até o fim','{p} flanqueou pelo lado e pegou a retaguarda inimiga no meio da luta','{p} dividiu o mapa, empurrou a lane lateral e obrigou o rival a se desdobrar','{p} dominou a linha de frente e aguentou todo o dano da luta decisiva'],
+['{p} fez o gank certeiro no começo, garantiu o primeiro abate e acelerou o jogo','{p} roubou o Barão com um smite perfeito e mudou o rumo da partida','{p} garantiu o Dragão com um smite no último segundo e fechou a Alma','{p} invadiu a selva inimiga, atrasou o rival e controlou os objetivos','{p} apareceu pelas costas na luta e pegou os dois carregadores adversários','{p} controlou o ritmo do mapa e não deu espaço para o rival respirar'],
+['{p} venceu a rota do meio, ganhou prioridade e fez o time rotacionar primeiro','{p} acertou a habilidade em área que pegou três inimigos na luta decisiva','{p} eliminou o ADC rival logo no começo da luta e definiu a partida','{p} controlou a luta com o controle de multidão e protegeu a equipe','{p} flanqueou do meio e fechou o Ace que terminou a partida','{p} fez a rota ficar sem respiro e abriu o mapa para os companheiros'],
+['{p} causou dano enorme em todas as lutas e carregou o time na reta final','{p} sobreviveu à luta com pouca vida e fechou o Ace','{p} fez um kite perfeito e derrubou o time inimigo quase sozinho','{p} escalou bem com os itens completos e dominou a fase final','{p} se posicionou com precisão e derrubou o nexus no momento certo','{p} foi o grande destaque da luta do Dragão, com dano constante sem sair do lugar'],
+['{p} acertou a iniciação decisiva e virou a luta a favor do time','{p} salvou o ADC no último segundo com um escudo e permitiu a virada','{p} dominou a visão do mapa e evitou todas as emboscadas do rival','{p} protegeu o carregador com perfeição e a luta foi decidida a favor','{p} pegou o inimigo fora de posição e abriu a vantagem em abates','{p} rodou pelo mapa no tempo certo e garantiu o controle dos objetivos']];
+function moment(m,j,win,ur,decisive){
+ const team=win?S.lineup:m.o.pl;let roles=[0,1,2,3,4].filter(r=>!ur.has(r));if(!roles.length)roles=[0,1,2,3,4];
+ const r=roles[Math.floor(Math.random()*roles.length)];ur.add(r);
+ const p=team[r],arr=STORY[r],txt=arr[Math.floor(Math.random()*arr.length)].replace('{p}','<b>'+p.n+'</b>');
+ return `<div class="lg ${win?'w':'l'}"><span class="gn">Jogo ${j+1}${decisive?' (decisivo)':''}</span> ${win?'':'['+m.o.name+' '+m.o.year+'] '}${txt}</div>`}
 async function sim(){
  const s=strength(),opp=opponents(),t=T[CFG.speed],manual=CFG.mode==='manual';let wins=0,over=false;const out=[];SKIP=false;
  for(let k=0;k<ROUNDS.length;k++){if(over)break;const[r,bo]=ROUNDS[k],o=opp[k],x=series(s.tot,avgOf(o),bo);out.push({r,o,bo,...x});if(x.w)wins++;else over=true}
  saveBest(wins);
  const desc=o=>`${o.name} ${o.year}<small>${o.pl.map(p=>p.n).join(' · ')} · força ${avgOf(o).toFixed(1)}</small>`;
- app.innerHTML=`<h1>Campanha</h1>${lineupHTML()}<p class="stat">Seus adversários, em ordem de dificuldade:</p><div class="res" id="res">${opp.map((o,k)=>`<div class="m" id="m${k}"><div><small style="display:inline">${ROUNDS[k][0]} (MD${ROUNDS[k][1]})</small><br><b>vs ${desc(o)}</b><div class="dots" id="d${k}"></div></div><div class="sc" id="s${k}">vs</div></div>`).join('')}</div><div class="row"><button class="btn hide" id="nx">Jogar →</button><button class="btn sec" id="skip">Pular animação</button></div><div id="end" class="hide"></div>`;
+ app.innerHTML=`<h1>Campanha</h1>${lineupHTML()}<p class="stat">Seus adversários, em ordem de dificuldade:</p><div class="res" id="res">${opp.map((o,k)=>`<div class="m" id="m${k}"><div><small style="display:inline">${ROUNDS[k][0]} (MD${ROUNDS[k][1]})</small><br><b>vs ${desc(o)}</b><div class="dots" id="d${k}"></div><div class="log" id="l${k}"></div></div><div class="sc" id="s${k}">vs</div></div>`).join('')}</div><div class="row"><button class="btn hide" id="nx">Jogar →</button><button class="btn sec" id="skip">Pular animação</button></div><div id="end" class="hide"></div>`;
  $('#skip').onclick=()=>{SKIP=true;const n=$('#nx');if(!n.classList.contains('hide'))n.click()};
  const next=lbl=>new Promise(res=>{if(SKIP)return res();const b=$('#nx');b.textContent=lbl;b.classList.remove('hide');b.onclick=()=>{b.classList.add('hide');res()}});
  for(let i=0;i<out.length;i++){
   const m=out[i],el=$('#m'+i),sc=$('#s'+i),dots=$('#d'+i),need=(m.bo+1)/2;
   el.classList.add('live');if(!SKIP)el.scrollIntoView({block:'center',behavior:'smooth'});
-  let a=0,b=0;
+  let a=0,b=0;const ur=new Set();
   if(manual)await next(`Iniciar série: ${m.r} →`);
   for(let j=0;j<m.g.length;j++){
    const decisive=a===need-1&&b===need-1,point=a===need-1||b===need-1;
    const lbl=decisive?'Jogo decisivo':'Jogo '+(j+1);
    sc.innerHTML=`<span class="pend">${lbl}…</span>`;
    await sleep(decisive?t.d:point?t.p:t.g);
-   m.g[j]?a++:b++;sc.textContent=a+'–'+b;dots.insertAdjacentHTML('beforeend',`<i class="d ${m.g[j]?'w':'l'}"></i>`);
+   m.g[j]?a++:b++;sc.textContent=a+'–'+b;dots.insertAdjacentHTML('beforeend',`<i class="d ${m.g[j]?'w':'l'}"></i>`);$('#l'+i).insertAdjacentHTML('beforeend',moment(m,j,m.g[j],ur,decisive));
    if(j<m.g.length-1)await sleep(t.gap);
   }
   el.classList.remove('live');el.classList.add(m.w?'w':'l');sc.textContent=a+'–'+b;
