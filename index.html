@@ -136,7 +136,7 @@ function best(){try{return localStorage.getItem('lol7a0best')||'0'}catch(e){retu
 function saveBest(w){try{if(w>+best())localStorage.setItem('lol7a0best',w)}catch(e){}}
 function roll(){const av=TEAMS.map((t,i)=>i).filter(i=>!S.used.includes(i));const i=av[Math.floor(Math.random()*av.length)];S.used.push(i);S.cur=TEAMS[i]}
 function start(){track('funil/01-jogar');fresh();S.phase='draft';roll();draw()}
-function pick(i){const p=S.cur.pl[i];if(S.lineup[p.role])return;S.lineup[p.role]=p;{const nn=S.lineup.filter(Boolean).length;track(nn===5?'funil/03-time-pronto':'funil/02-escolha-'+nn)}if(S.lineup.every(Boolean)){S.phase='ready';S.cur=null}else roll();draw()}
+function pick(i){const p=S.cur.pl[i];if(S.lineup[p.role])return;S.lineup[p.role]=p;if(S.lineup.every(Boolean))track('funil/02-time-pronto');if(S.lineup.every(Boolean)){S.phase='ready';S.cur=null}else roll();draw()}
 function reroll(){if(S.rr<1)return;S.rr--;roll();draw()}
 function strength(){const L=S.lineup,avg=L.reduce((a,p)=>a+p.v,0)/5;const c={};L.forEach(p=>c[p.org]=(c[p.org]||0)+1);let syn=0;const grp=[];for(const k in c)if(c[k]>1){syn+=(c[k]-1)*1.2;grp.push(k+' ('+c[k]+')')}return{avg,syn,grp,tot:avg+syn}}
 function lineupHTML(){return '<div class="lineup">'+ROLES.map((r,i)=>{const p=S.lineup[i];return p?`<div class="slot f"><div class="r">${r}</div><div class="n">${p.n}</div><div class="t">${p.team}</div><div class="v">${p.v}</div></div>`:`<div class="slot"><div class="r">${r}</div><div class="n" style="color:var(--mut)">—</div></div>`}).join('')+'</div>'}
@@ -168,7 +168,7 @@ function moment(m,j,win,ur,decisive){
  const p=team[r],arr=STORY[r],txt=arr[Math.floor(Math.random()*arr.length)].replace('{p}','<b>'+p.n+'</b>');
  return `<div class="lg ${win?'w':'l'}"><span class="gn">Jogo ${j+1}${decisive?' (decisivo)':''}</span> ${win?'':'['+m.o.name+' '+m.o.year+'] '}${txt}</div>`}
 async function sim(){
- const s=strength(),opp=opponents(),t=T[CFG.speed],manual=CFG.mode==='manual';let wins=0,over=false;const out=[];SKIP=false;track('funil/04-simular');track('config/modo-'+CFG.mode);track('config/velocidade-'+CFG.speed);
+ const s=strength(),opp=opponents(),t=T[CFG.speed],manual=CFG.mode==='manual';let wins=0,over=false;const out=[];SKIP=false;track('funil/03-simular');track('config/modo-'+CFG.mode);track('config/velocidade-'+CFG.speed);
  for(let k=0;k<ROUNDS.length;k++){if(over)break;const[r,bo]=ROUNDS[k],o=opp[k],x=series(s.tot,avgOf(o),bo);out.push({r,o,bo,...x});if(x.w)wins++;else over=true}
  saveBest(wins);
  const desc=o=>`${o.name} ${o.year}<small>${o.pl.map(p=>p.n).join(' · ')} · força ${avgOf(o).toFixed(1)}</small>`;
@@ -188,7 +188,7 @@ async function sim(){
    m.g[j]?a++:b++;sc.textContent=a+'–'+b;dots.insertAdjacentHTML('beforeend',`<i class="d ${m.g[j]?'w':'l'}"></i>`);$('#l'+i).insertAdjacentHTML('beforeend',moment(m,j,m.g[j],ur,decisive));
    if(j<m.g.length-1)await sleep(t.gap);
   }
-  el.classList.remove('live');el.classList.add(m.w?'w':'l');sc.textContent=a+'–'+b;track('funil/05-serie-'+(i+1)+(m.w?'-vitoria':'-derrota'));
+  el.classList.remove('live');el.classList.add(m.w?'w':'l');sc.textContent=a+'–'+b;
   await sleep(t.end);
  }
  $('#skip').classList.add('hide');$('#nx').classList.add('hide');
@@ -204,7 +204,7 @@ function trophy(){
  $('#trx').onclick=()=>d.remove();
 }
 function final(w,played){
- const perfect=w===7,e=$('#end');track('funil/06-campanha-concluida');track('resultado/'+w+'-vitorias');if(perfect)track('funil/07-campeao-7x0');e.classList.remove('hide');
+ const perfect=w===7,e=$('#end');track('funil/04-concluida');track('resultado/'+w+'-vitorias');e.classList.remove('hide');
  const txt=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
  const lost=played-w;
  e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button><button class="btn sec" id="cp">Copiar resultado</button></div>`;
