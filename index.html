@@ -136,7 +136,7 @@ const ROUNDS=[['Fase Suíça · R1',3],['Fase Suíça · R2',3],['Fase Suíça �
 const avgOf=t=>t.pl.reduce((a,p)=>a+p.v,0)/5;
 function opponents(){const mine=S.lineup.map(p=>p.team);const pool=TEAMS.filter(t=>!mine.includes(t.name+' '+t.year)).sort((a,b)=>avgOf(a)-avgOf(b));const n=pool.length,w=Math.max(1,Math.round(n/10)),used=new Set(),res=[];for(let k=0;k<ROUNDS.length;k++){const c=Math.round(k*(n-1)/6);let lo=Math.max(0,c-w),hi=Math.min(n-1,c+w);if(k===ROUNDS.length-1){hi=n-1;lo=Math.max(0,n-1-2*w)}let cand=[];for(let i=lo;i<=hi;i++)if(!used.has(i))cand.push(i);if(!cand.length)for(let i=0;i<n;i++)if(!used.has(i))cand.push(i);const i=cand[Math.floor(Math.random()*cand.length)];used.add(i);res.push(pool[i])}return res.sort((a,b)=>avgOf(a)-avgOf(b))}
 const $=s=>document.querySelector(s),app=$('#app');
-const GC_CODE='';
+const GC_CODE='7a0lol';
 const GCQ=[];let GCR=false;
 function track(n){try{if(!GC_CODE)return;if(GCR&&window.goatcounter&&goatcounter.count)goatcounter.count({path:n,title:n,event:true,no_session:true});else GCQ.push(n)}catch(e){}}
 (function(){if(!GC_CODE)return;try{const s=document.createElement('script');s.async=true;s.dataset.goatcounter='https://'+GC_CODE+'.goatcounter.com/count';s.src='https://gc.zgo.at/count.js';s.onload=()=>{GCR=true;GCQ.splice(0).forEach(track)};document.head.appendChild(s)}catch(e){}})();
