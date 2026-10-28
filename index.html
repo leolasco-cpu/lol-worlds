@@ -128,9 +128,11 @@ G2 Esports|2021|BrokenBlade:86,Jankos:86,Caps:90,Rekkles:86,Mikyx:84
 G2 Esports|2023|BrokenBlade:88,Yike:84,Caps:90,Hans sama:88,Mikyx:86
 PSG Talon|2021|Hanabi:82,River:80,Maple:84,Unified:80,Kaiwing:82
 paiN Gaming|2021|Robo:78,Cariok:78,Tinowns:80,brTT:80,Luci:76
-LØS|2026|Zest:80,Curse:78,Feisty:80,Duduhh:78,Ackerman:76`;
+LØS|2026|Zest:80,Curse:78,Feisty:80,Duduhh:78,Ackerman:76
+CTBC Flying Oyster|2026|Rest:78,Shad0w:84,Pout:80,Doggo:82,Kino:78
+Team Secret Whales|2026|Pun:78,Hizto:82,Dire:82,Eddie:84,Bie:80`;
 const ORG={'SKT T1':'T1','Samsung Galaxy':'Gen.G','Samsung White':'Gen.G'};
-const REG={'SKT T1':'LCK','Samsung White':'LCK','Samsung Galaxy':'LCK','DAMWON Gaming':'LCK','DRX':'LCK','Gen.G':'LCK','T1':'LCK','Hanwha Life Esports':'LCK','Invictus Gaming':'LPL','Royal Never Give Up':'LPL','FunPlus Phoenix':'LPL','EDward Gaming':'LPL','JD Gaming':'LPL','Bilibili Gaming':'LPL','G2 Esports':'LEC','Fnatic':'LEC','MAD Lions':'LEC','Cloud9':'LCS','Team Liquid':'LCS','TSM':'LCS','100 Thieves':'LCS','PSG Talon':'PCS','LOUD':'CBLOL','paiN Gaming':'CBLOL','LØS':'CBLOL'};
+const REG={'SKT T1':'LCK','Samsung White':'LCK','Samsung Galaxy':'LCK','DAMWON Gaming':'LCK','DRX':'LCK','Gen.G':'LCK','T1':'LCK','Hanwha Life Esports':'LCK','Invictus Gaming':'LPL','Royal Never Give Up':'LPL','FunPlus Phoenix':'LPL','EDward Gaming':'LPL','JD Gaming':'LPL','Bilibili Gaming':'LPL','G2 Esports':'LEC','Fnatic':'LEC','MAD Lions':'LEC','Cloud9':'LCS','Team Liquid':'LCS','TSM':'LCS','100 Thieves':'LCS','PSG Talon':'PCS','LOUD':'CBLOL','paiN Gaming':'CBLOL','LØS':'CBLOL','CTBC Flying Oyster':'LCP','Team Secret Whales':'LCP'};
 const TEAMS=RAW.split('\n').map(l=>{const[a,y,p]=l.split('|');return{name:a,year:y,pl:p.split(',').map((x,i)=>{const[n,v]=x.split(':');return{n,v:+v,role:i,team:a+' '+y,org:ORG[a]||a}})}});
 const ROUNDS=[['Fase Suíça · R1',3],['Fase Suíça · R2',3],['Fase Suíça · R3',3],['Fase Suíça · R4',3],['Quartas de final',5],['Semifinal',5],['Grande Final',5]];
 const avgOf=t=>t.pl.reduce((a,p)=>a+p.v,0)/5;
@@ -141,7 +143,7 @@ const GCQ=[];let GCR=false;
 function track(n){try{if(!GC_CODE)return;if(GCR&&window.goatcounter&&goatcounter.count)goatcounter.count({path:n,title:n,event:true,no_session:true});else GCQ.push(n)}catch(e){}}
 (function(){if(!GC_CODE)return;try{const s=document.createElement('script');s.async=true;s.dataset.goatcounter='https://'+GC_CODE+'.goatcounter.com/count';s.src='https://gc.zgo.at/count.js';s.onload=()=>{GCR=true;GCQ.splice(0).forEach(track)};document.head.appendChild(s)}catch(e){}})();
 let S;
-function fresh(){S={lineup:[null,null,null,null,null],used:[],cur:null,rr:2,phase:'intro'}}
+function fresh(){S={lineup:[null,null,null,null,null],used:[],cur:null,rr:1,phase:'intro'}}
 function best(){try{return localStorage.getItem('lol7a0best')||'0'}catch(e){return '0'}}
 function saveBest(w){try{if(w>+best())localStorage.setItem('lol7a0best',w)}catch(e){}}
 function roll(){const av=TEAMS.map((t,i)=>i).filter(i=>!S.used.includes(i));const i=av[Math.floor(Math.random()*av.length)];S.used.push(i);S.cur=TEAMS[i]}
