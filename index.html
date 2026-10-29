@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>7a0 LoL — Monte o time dos sonhos</title>
+<title>Sete Zero LoL — Monte o time dos sonhos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -138,7 +138,7 @@ const ROUNDS=[['Fase Suíça · R1',3],['Fase Suíça · R2',3],['Fase Suíça �
 const avgOf=t=>t.pl.reduce((a,p)=>a+p.v,0)/5;
 function opponents(){const mine=S.lineup.map(p=>p.team);const pool=TEAMS.filter(t=>!mine.includes(t.name+' '+t.year)).sort((a,b)=>avgOf(a)-avgOf(b));const n=pool.length,w=Math.max(1,Math.round(n/10)),used=new Set(),res=[];for(let k=0;k<ROUNDS.length;k++){const c=Math.round(k*(n-1)/6);let lo=Math.max(0,c-w),hi=Math.min(n-1,c+w);if(k===ROUNDS.length-1){hi=n-1;lo=Math.max(0,n-1-2*w)}let cand=[];for(let i=lo;i<=hi;i++)if(!used.has(i))cand.push(i);if(!cand.length)for(let i=0;i<n;i++)if(!used.has(i))cand.push(i);const i=cand[Math.floor(Math.random()*cand.length)];used.add(i);res.push(pool[i])}return res.sort((a,b)=>avgOf(a)-avgOf(b))}
 const $=s=>document.querySelector(s),app=$('#app');
-const GC_CODE='lanf';
+const GC_CODE='';
 const GCQ=[];let GCR=false;
 function track(n){try{if(!GC_CODE)return;if(GCR&&window.goatcounter&&goatcounter.count)goatcounter.count({path:n,title:n,event:true,no_session:true});else GCQ.push(n)}catch(e){}}
 (function(){if(!GC_CODE)return;try{const s=document.createElement('script');s.async=true;s.dataset.goatcounter='https://'+GC_CODE+'.goatcounter.com/count';s.src='https://gc.zgo.at/count.js';s.onload=()=>{GCR=true;GCQ.splice(0).forEach(track)};document.head.appendChild(s)}catch(e){}})();
@@ -153,7 +153,7 @@ function reroll(){if(S.rr<1)return;S.rr--;roll();draw()}
 function strength(){const L=S.lineup,avg=L.reduce((a,p)=>a+p.v,0)/5;const c={};L.forEach(p=>c[p.org]=(c[p.org]||0)+1);let syn=0;const grp=[];for(const k in c)if(c[k]>1){syn+=(c[k]-1)*1.2;grp.push(k+' ('+c[k]+')')}return{avg,syn,grp,tot:avg+syn}}
 function lineupHTML(){return '<div class="lineup">'+ROLES.map((r,i)=>{const p=S.lineup[i];return p?`<div class="slot f"><div class="r">${r}</div><div class="n">${p.n}</div><div class="t">${p.team}</div><div class="v">${p.v}</div></div>`:`<div class="slot"><div class="r">${r}</div><div class="n" style="color:var(--mut)">—</div></div>`}).join('')+'</div>'}
 function draw(){
- if(S.phase==='intro'){app.innerHTML=`<h1>7<b>a</b>0 <span style="font-weight:400">LoL</span></h1><p class="sub">Role os dados, receba um time e uma temporada do cenário competitivo, escolha um jogador que realmente esteve lá e monte seu line-up dos sonhos. Depois enfrente 7 séries: vença todas e você alcança o 7–0.</p><div class="row"><button class="btn" id="go">Jogar →</button></div><p class="stat">Melhor campanha: ${best()} vitórias seguidas · ${TEAMS.length} elencos · ${TEAMS.length*5} jogadores</p><p class="stat">Dica: jogadores da mesma organização ganham bônus de entrosamento, mesmo que de anos diferentes (ex.: Faker em 2013 e Keria em 2024, ambos T1).</p>`;$('#go').onclick=start;return}
+ if(S.phase==='intro'){app.innerHTML=`<h1><b>Sete a Zero</b> <span style="font-weight:400">LoL</span></h1><p class="sub">Role os dados, receba um time e uma temporada do cenário competitivo, escolha um jogador que realmente esteve lá e monte seu line-up dos sonhos. Depois enfrente 7 séries: vença todas e você alcança o 7–0.</p><div class="row"><button class="btn" id="go">Jogar →</button></div><p class="stat">Melhor campanha: ${best()} vitórias seguidas · ${TEAMS.length} elencos · ${TEAMS.length*5} jogadores</p><p class="stat">Dica: jogadores da mesma organização ganham bônus de entrosamento, mesmo que de anos diferentes (ex.: Faker em 2013 e Keria em 2024, ambos T1).</p>`;$('#go').onclick=start;return}
  if(S.phase==='draft'){const n=S.lineup.filter(Boolean).length;app.innerHTML=`<h1>Escolha ${n+1}/5</h1>${lineupHTML()}<div class="roll"><h2>${S.cur.name}</h2><p class="y">Temporada ${S.cur.year} · ${REG[S.cur.name]||''} · escolha uma lane ainda vaga</p><div class="pl">${S.cur.pl.map((p,i)=>`<button data-i="${i}" ${S.lineup[p.role]?'disabled':''}><span class="v">${p.v}</span><div class="r">${ROLES[p.role]}</div><div class="n">${p.n}</div></button>`).join('')}</div></div><div class="row" style="margin-top:12px"><button class="btn sec" id="rr" ${S.rr<1?'disabled':''}>Rolar de novo (${S.rr})</button></div>`;
   app.querySelectorAll('.pl button').forEach(b=>b.onclick=()=>pick(+b.dataset.i));$('#rr').onclick=reroll;return}
  if(S.phase==='ready'){const s=strength();app.innerHTML=`<h1>Seu time está pronto</h1>${lineupHTML()}<p class="stat">Média ${s.avg.toFixed(1)} + entrosamento ${s.syn.toFixed(1)} = força <b>${s.tot.toFixed(1)}</b></p><p class="stat">${s.grp.length?'Entrosamento: '+s.grp.join(', '):'Sem entrosamento: nenhum jogador da mesma organização.'}</p><p class="stat" style="margin-top:18px">Modo:</p><div class="row">${chips('mode',MODES)}</div><p class="stat" id="mdesc">${MDESC[CFG.mode]}</p><p class="stat" style="margin-top:12px">Velocidade:</p><div class="row">${chips('speed',SPEEDS)}</div><p class="stat" id="sdesc">${SDESC[CFG.speed]}</p><div class="row" style="margin-top:14px"><button class="btn" id="sim">Simular campanha</button><button class="btn sec" id="re">Recomeçar</button></div>`;app.querySelectorAll('.chip').forEach(b=>b.onclick=()=>{const g=b.dataset.g;CFG[g]=b.dataset.k;app.querySelectorAll('.chip[data-g="'+g+'"]').forEach(c=>c.classList.toggle('on',c===b));$('#mdesc').textContent=MDESC[CFG.mode];$('#sdesc').textContent=SDESC[CFG.speed]});$('#sim').onclick=sim;$('#re').onclick=start;return}
@@ -217,11 +217,11 @@ function trophy(){
 }
 function final(w,played){
  const perfect=w===7,e=$('#end');track('funil/04-concluida');track('resultado/'+w+'-vitorias');e.classList.remove('hide');
- const txt=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
+ const txt=`Meu time no Sete a Zero LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
  const lost=played-w;
  e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button><button class="btn sec" id="cp">Copiar resultado</button></div>`;
  $('#again').onclick=start;if(perfect)setTimeout(trophy,500);
- $('#cp').onclick=()=>{const m=`Meu time no 7a0 LoL: ${S.lineup.map(p=>p.n).join(' / ')} · ${w}–${lost}${perfect?' 🏆':''}`;try{navigator.clipboard.writeText(m);$('#cp').textContent='Copiado!'}catch(x){$('#cp').textContent=m}}
+ $('#cp').onclick=()=>{const m=`Meu time no Sete a Zero LoL (setezerolol.com.br): ${S.lineup.map(p=>p.n).join(' / ')} · ${w}–${lost}${perfect?' 🏆':''}`;try{navigator.clipboard.writeText(m);$('#cp').textContent='Copiado!'}catch(x){$('#cp').textContent=m}}
 }
 fresh();draw();
 </script>
