@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sete Zero LoL — Monte o time dos sonhos</title>
+<title>Sete a Zero LoL — Monte o time dos sonhos</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
@@ -87,6 +87,7 @@ h1 span{font-weight:500}
 .rs.l b{color:#ff8a9a}
 .m.rsrow{box-shadow:0 0 18px rgba(200,170,110,.35)}
 @keyframes rsp{0%,100%{box-shadow:0 0 0 rgba(200,170,110,0)}50%{box-shadow:0 0 18px rgba(200,170,110,.6)}}
+a.btn{text-decoration:none;display:inline-block}
 .hide{display:none}
 @media(max-width:520px){.lineup{grid-template-columns:repeat(2,1fr)}h1{font-size:1.8rem}}
 </style>
@@ -215,13 +216,18 @@ function trophy(){
  document.body.appendChild(d);
  $('#trx').onclick=()=>d.remove();
 }
+function shareMsg(w,lost,perfect){const L=S.lineup.map((p,i)=>ROLES[i]+': '+p.n).join('\n');return (perfect?'🏆 ':'')+'Sete a Zero LoL — campanha '+w+'–'+lost+'\n'+L+'\nConsegue ir mais longe?'}
 function final(w,played){
  const perfect=w===7,e=$('#end');track('funil/04-concluida');track('resultado/'+w+'-vitorias');e.classList.remove('hide');
  const txt=`Meu time no Sete a Zero LoL: ${S.lineup.map(p=>p.n).join(' / ')} — campanha ${w}–${7-w>0&&played<7?played-w:7-w}${perfect?' 🏆 7–0!':''}`;
- const lost=played-w;
- e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button><button class="btn sec" id="cp">Copiar resultado</button></div>`;
+ const lost=played-w;const shUrl='https://setezerolol.com.br/?ref=share',shMsg=shareMsg(w,lost,perfect),shFull=shMsg+'\n'+shUrl,enc=encodeURIComponent;
+ e.innerHTML=`<div class="big">${w}–${lost}</div><p>${perfect?'Campanha perfeita! Você chegou ao 7–0.':w>=5?'Chegou perto da perfeição.':w>=3?'Campanha respeitável, mas dá para melhorar.':'Eliminado cedo. Tente outro draft.'}</p><div class="row"><button class="btn" id="again">Jogar de novo</button></div><p class="stat" style="margin-top:18px">Compartilhar resultado:</p><div class="row" id="shr"><a class="btn sec chip" data-n="whatsapp" target="_blank" rel="noopener" href="https://wa.me/?text=${enc(shFull)}">WhatsApp</a><a class="btn sec chip" data-n="telegram" target="_blank" rel="noopener" href="https://t.me/share/url?url=${enc(shUrl)}&text=${enc(shMsg)}">Telegram</a><a class="btn sec chip" data-n="x" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${enc(shMsg)}&url=${enc(shUrl)}">X</a><button class="btn sec chip" data-n="discord" id="shd">Discord</button><button class="btn sec chip" data-n="copiar" id="shc">Copiar</button><button class="btn sec chip hide" data-n="nativo" id="shn">Mais opções</button></div><p class="stat" id="shm"></p>`;
  $('#again').onclick=start;if(perfect)setTimeout(trophy,500);
- $('#cp').onclick=()=>{const m=`Meu time no Sete a Zero LoL (setezerolol.com.br): ${S.lineup.map(p=>p.n).join(' / ')} · ${w}–${lost}${perfect?' 🏆':''}`;try{navigator.clipboard.writeText(m);$('#cp').textContent='Copiado!'}catch(x){$('#cp').textContent=m}}
+ document.querySelectorAll('#shr [data-n]').forEach(b=>b.addEventListener('click',()=>track('compartilhar/'+b.dataset.n)));
+ const cpTxt=async msg=>{try{await navigator.clipboard.writeText(shFull);$('#shm').textContent=msg}catch(x){$('#shm').textContent='Copie manualmente: '+shFull.replace(/\n/g,' | ')}};
+ $('#shd').onclick=()=>cpTxt('Copiado! Cole no Discord.');
+ $('#shc').onclick=()=>cpTxt('Resultado copiado!');
+ if(navigator.share){const n=$('#shn');n.classList.remove('hide');n.onclick=()=>navigator.share({title:'Sete a Zero LoL',text:shMsg,url:shUrl}).catch(()=>{})}
 }
 fresh();draw();
 </script>
